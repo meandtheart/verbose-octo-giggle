@@ -233,6 +233,8 @@ document.querySelectorAll("img").forEach(function (image) {
 
 let touchStartX = 0;
 let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
 
 // Define the ordered list of section IDs matching your navigation flow
 const sectionOrder = [
@@ -253,19 +255,24 @@ const mainSiteContainer = document.getElementById("mainSite");
 if (mainSiteContainer) {
     mainSiteContainer.addEventListener("touchstart", function (event) {
         touchStartX = event.changedTouches[0].screenX;
+        touchStartY = event.changedTouches[0].screenY;
     }, { passive: true });
 
     mainSiteContainer.addEventListener("touchend", function (event) {
         touchEndX = event.changedTouches[0].screenX;
+        touchEndY = event.changedTouches[0].screenY;
         handleSwipeGesture();
     }, { passive: true });
 }
 
 function handleSwipeGesture() {
-    const swipeThreshold = 50; // Minimum distance required for a swipe
+    const swipeThreshold = 90; // Minimum horizontal distance required for a swipe
+    const maxVerticalRatio = 0.5; // Vertical movement must stay well below horizontal to count as a swipe
     const diff = touchEndX - touchStartX;
+    const verticalDiff = Math.abs(touchEndY - touchStartY);
 
     if (Math.abs(diff) < swipeThreshold) return; // Ignore accidental micro-swipes
+    if (verticalDiff > Math.abs(diff) * maxVerticalRatio) return; // Ignore mostly-vertical scrolls
 
     // Find the currently active section
     const activeSection = document.querySelector("#mainSite .section.active-section");
