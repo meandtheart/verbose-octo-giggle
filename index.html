@@ -736,21 +736,14 @@ What's a small thing that can instantly make your day better?
         ================================================== -->
 
         <section class="section letter-section" id="letter">
+		
+		<div class="letter-external-intro">
+                <p class="external-note-text">
+                    Some writings for you, though you're not a person of this type...
+                </p>
+            </div>
 
             <div class="letter-paper">
-
-                <div class="letter-top">
-
-                    <span>
-                       Some writings for you,though you're not a person of this type
-                    </span>
-
-                    
-                      
-                   
-
-                </div>
-
 
                 <div class="letter-content">
 
@@ -807,49 +800,51 @@ And whatever happens next, I hope you'll remember that somewhere along the way, 
 
                 </div>
 
-            </div>
-			
-			<div style="text-align: center; margin-top: 60px;">
+</div>
+            
+            <!-- BUTTON 1: Normal path to the final page -->
+            <div style="text-align: center; margin-top: 50px;">
                 <button class="text-button scroll-btn" data-target="final-section">
                     <b>Sooo...</b> <span>↓</span>
+                </button>
+            </div>
+
+            <!-- SECRET EASTER EGG: Hidden right here. If she clicks it, your secret overlay opens! -->
+            <div style="text-align: center; margin-top: 30px;">
+                <button id="eclipseButton" class="eclipse-button" aria-label="Something hidden" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; opacity: 0.3;">
+                    ◐
                 </button>
             </div>
 
         </section>
 
 
-        <!-- =================================================
-             HIDDEN ECLIPSE
-        ================================================== -->
-
-        <section class="secret-section">
-
-            <button
-                id="eclipseButton"
-                class="eclipse-button"
-                aria-label="Something hidden"
-            >
-                ◐
-            </button>
-
-            <p>
-                
-            </p>
-
-        </section>
-
-
-        <!-- =================================================
+<!-- =================================================
              FINAL PAGE
         ================================================== -->
 
         <section class="section final-section" id="final-section">
 
-            <div class="final-content">
+            <!-- Background Starfield across the whole section -->
+            <div class="final-starfield">
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+                <span class="bg-star"></span>
+            </div>
 
-                <p class="eyebrow">
-                    .
-                </p>
+            <!-- True Live Orbital Eclipse Graphic in the middle -->
+            <div class="orbit-eclipse-container">
+                <div class="eclipse-light-rays"></div>
+                <div class="mauve-sun"></div>
+                <div class="dark-moon-orbit"></div>
+            </div>
+
+            <div class="final-content">
 
                 <h2>
                     Happy<br>Birthday<br>Eclipse
@@ -884,7 +879,7 @@ And whatever happens next, I hope you'll remember that somewhere along the way, 
                     </p>
 
                     <p class="final-highlight">
-                                                Have a genuinely good birthday,
+                        Have a genuinely good birthday,
                         Nistha.
                     </p>
 
