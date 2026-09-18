@@ -1,5 +1,5 @@
 // ================================
-// ENTER BUTTON
+// ENTER BUTTON & INITIAL SETUP
 // ================================
 
 const intro = document.getElementById("intro");
@@ -7,171 +7,78 @@ const mainSite = document.getElementById("mainSite");
 const enterBtn = document.getElementById("enterBtn");
 
 enterBtn.addEventListener("click", function () {
-
-    // Hide intro
+    // Hide intro screen
     intro.classList.add("hide");
 
-    // Show website
+    // Show main website after a brief pause
     setTimeout(function () {
-
         mainSite.classList.add("visible");
+        window.scrollTo(0, 0);
+
+        // Show the first section (hero) by default
+        const heroSection = document.querySelector(".hero");
+        if (heroSection) {
+            heroSection.classList.add("active-section");
+        }
 
         startRevealObserver();
-
-        initSlides();
-
     }, 700);
 });
 
 
 // ================================
-// CLICK-TO-NAVIGATE SLIDES
-// (each section is a full-screen "page";
-// moving between them happens by clicking
-// a dot, the arrow, or a text-button —
-// never by scrolling the page itself)
-// ================================
-
-const slidesTrack = document.getElementById("slidesTrack");
-const slideNav = document.getElementById("slideNav");
-const slideNextBtn = document.getElementById("slideNextBtn");
-
-let slides = [];
-let currentSlide = 0;
-let slidesReady = false;
-
-// Sections whose background is dark, so the
-// nav dots / arrow can switch to a light-safe look
-const darkSlideIds = ["timeline", "final"];
-
-function initSlides() {
-
-    if (slidesReady) {
-        return;
-    }
-
-    slides = Array.prototype.slice.call(slidesTrack.children);
-
-    // Build the dot navigation
-    slides.forEach(function (slide, index) {
-
-        const dot = document.createElement("button");
-
-        dot.classList.add("slide-dot");
-        dot.type = "button";
-        dot.setAttribute("aria-label", "Go to section " + (index + 1) + " of " + slides.length);
-
-        dot.addEventListener("click", function () {
-            goToSlide(index);
-        });
-
-        slideNav.appendChild(dot);
-
-    });
-
-    slideNextBtn.classList.add("visible");
-
-    slideNextBtn.addEventListener("click", function () {
-
-        if (currentSlide === slides.length - 1) {
-            goToSlide(0);
-        } else {
-            goToSlide(currentSlide + 1);
-        }
-
-    });
-
-    document.addEventListener("keydown", function (event) {
-
-        if (!mainSite.classList.contains("visible")) {
-            return;
-        }
-
-        if (secretOverlay.classList.contains("active")) {
-            return;
-        }
-
-        if (["ArrowDown", "ArrowRight", "PageDown"].indexOf(event.key) !== -1) {
-            event.preventDefault();
-            goToSlide(currentSlide + 1);
-        }
-
-        if (["ArrowUp", "ArrowLeft", "PageUp"].indexOf(event.key) !== -1) {
-            event.preventDefault();
-            goToSlide(currentSlide - 1);
-        }
-
-        if (event.key === "Home") {
-            event.preventDefault();
-            goToSlide(0);
-        }
-
-        if (event.key === "End") {
-            event.preventDefault();
-            goToSlide(slides.length - 1);
-        }
-
-    });
-
-    slidesReady = true;
-
-    goToSlide(0);
-
-}
-
-function goToSlide(index) {
-
-    if (index < 0 || index > slides.length - 1) {
-        return;
-    }
-
-    currentSlide = index;
-
-    slidesTrack.style.transform = "translateY(-" + (index * 100) + "vh)";
-
-    const dots = slideNav.querySelectorAll(".slide-dot");
-
-    dots.forEach(function (dot, dotIndex) {
-        dot.classList.toggle("active", dotIndex === index);
-    });
-
-    const currentId = slides[index].id;
-    const onDark = darkSlideIds.indexOf(currentId) !== -1;
-
-    slideNav.setAttribute("data-on-dark", onDark ? "true" : "false");
-    slideNextBtn.setAttribute("data-on-dark", onDark ? "true" : "false");
-
-    slideNextBtn.classList.toggle("at-end", index === slides.length - 1);
-
-}
-
-
-// ================================
-// TEXT-BUTTON SECTION LINKS
-// (the "right here", "Anyway..." etc. buttons
-// jump straight to a named slide, with the
-// same click-to-navigate animation)
+// SAFE GRID SCREEN SWITCHER
 // ================================
 
 const scrollButtons = document.querySelectorAll(".scroll-btn");
+const allSections = document.querySelectorAll("#mainSite .section, #mainSite .secret-section");
 
 scrollButtons.forEach(function (button) {
-
     button.addEventListener("click", function () {
-
         const targetId = button.getAttribute("data-target");
-        const targetIndex = slides.findIndex(function (slide) {
-            return slide.id === targetId;
-        });
+        const target = document.getElementById(targetId);
 
-        if (targetIndex !== -1) {
-            goToSlide(targetIndex);
+        if (target) {
+            // Remove active and direction classes from all sections
+            allSections.forEach(function (sec) {
+                sec.classList.remove(
+                    "active-section",
+                    "slide-from-top",
+                    "slide-from-right",
+                    "fade-in-only",
+                    "fade-out-style",
+                    "final-cinematic-reveal"
+                );
+            });
+
+            // Assign the correct transition effect based on your custom flow
+            if (targetId === "birthday" || targetId === "unknown" || targetId === "letter") {
+                target.classList.add("slide-from-top");
+            } else if (targetId === "story" || targetId === "timeline") {
+                target.classList.add("slide-from-right");
+            } else if (targetId === "archive" || targetId === "things") {
+                target.classList.add("fade-in-only");
+            } else if (targetId === "music") {
+                target.classList.add("fade-out-style");
+            } else if (targetId === "final-section") {
+                target.classList.add("final-cinematic-reveal");
+            } else {
+                target.classList.add("fade-in-only");
+            }
+
+            // Activate the target section right in place
+            target.classList.add("active-section");
+
+            // Gently scroll to the top of the new section after the transition starts
+            setTimeout(function () {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            }, 300);
         }
-
     });
-
 });
-
 
 // ================================
 // SCROLL REVEAL
