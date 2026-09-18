@@ -1,3 +1,4 @@
+```css
 /* =========================================================
    RESET
 ========================================================= */
@@ -10,16 +11,13 @@
 
 html {
     scroll-behavior: smooth;
-    height: 100%;
-    overflow: hidden;
 }
 
 body {
     font-family: "DM Sans", sans-serif;
     background: #f7f1ee;
     color: #493e43;
-    height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 button {
@@ -880,6 +878,8 @@ button {
     min-height: 100vh;
 
     background: #efe2e5;
+	flex-direction: column;
+	justify-content: center;
 
     display: flex;
     align-items: center;
@@ -971,6 +971,7 @@ button {
         0 30px 100px rgba(73,62,67,0.08);
 
     position: relative;
+	box-sizing: border-box;
 }
 
 .letter-paper::before {
@@ -1408,9 +1409,17 @@ button {
 
 
     /* LETTER */
+	
+	.letter-section {
+        padding: 100px 20px; /* Reduces side padding so the letter breathes on mobile */
+    }
 
     .letter-paper {
-        padding: 50px 25px;
+        padding: 40px 20px;
+    }
+	
+	.letter-content h2 {
+        font-size: clamp(32px, 7vw, 45px); /* Scales down the massive heading nicely */
     }
 
     .letter-paper::before {
@@ -1523,211 +1532,131 @@ button {
     }
 }
 
-/* =========================================================
-   CLICK-TO-NAVIGATE SLIDES
-   (each section becomes one full-screen "page"; moving
-   between them happens by clicking, not by scrolling)
-========================================================= */
-
 #mainSite {
     display: none;
-
-    position: fixed;
-    inset: 0;
-
-    height: 100vh;
-    overflow: hidden;
 }
 
 #mainSite.visible {
     display: block;
 }
 
-.slides-track {
-    height: 100vh;
 
-    transition: transform 0.95s cubic-bezier(0.65, 0, 0.35, 1);
-    will-change: transform;
+.custom-scroll-btn {
+    color: #e5c9d3 !important; /* Changes text color to mauve */
+    font-size: 14px !important; /* Makes text bigger */
+    letter-spacing: 3px;
+}
+@keyframes gentle-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
 }
 
-.slides-track > * {
-    height: 100vh;
-    max-height: 100vh;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+.custom-scroll-btn {
+    animation: gentle-bounce 2s infinite ease-in-out;
 }
 
-/* keep each slide's own min-height from fighting the fixed 100vh page height */
-.slides-track > .section,
-.slides-track > .final-section,
-.slides-track > .secret-section {
+.music-section {
+    display: block !important;
+}
+
+.music-section-bottom {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 50px;
+    clear: both;
+}
+
+/* =========================================================
+   SINGLE SCREEN / ABSOLUTE LAYER MODE
+========================================================= */
+
+/* Stack all sections on top of each other and hide them */
+#mainSite .section,
+#mainSite .secret-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
     min-height: 100vh;
-}
-
-
-/* ---------------------------------------------------------
-   Side dot navigation
---------------------------------------------------------- */
-
-.slide-nav {
-    position: fixed;
-    top: 50%;
-    right: 28px;
-    transform: translateY(-50%);
-    z-index: 500;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-
-    transition: opacity 0.6s ease;
+    transition: opacity 0.4s ease;
+    box-sizing: border-box;
 }
 
-#mainSite.visible ~ .slide-nav {
+/* Make mainSite relative so absolute sections stay inside it */
+#mainSite {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Show only the active section cleanly without breaking layout */
+#mainSite .section.active-section,
+#mainSite .secret-section.active-section {
+    position: relative; /* Restores normal document flow for the active screen */
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
 }
+/* =========================================================
+   SAFE GRID STACKING & SLOW TRANSITIONS
+========================================================= */
 
-.slide-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-
-    background: rgba(73,62,67,0.18);
-    border: 1px solid transparent;
-
-    transition:
-        background 0.35s ease,
-        transform 0.35s ease,
-        border-color 0.35s ease;
+#mainSite {
+    display: grid;
+    position: relative;
+    overflow: hidden;
 }
 
-.slide-dot:hover {
-    transform: scale(1.3);
-    background: var(--mauve-dark);
-}
-
-.slide-dot.active {
-    background: transparent;
-    border-color: var(--mauve-dark);
-    transform: scale(1.6);
-}
-
-/* dots sit on dark slides too, so give them a light-safe treatment */
-.slide-nav[data-on-dark="true"] .slide-dot {
-    background: rgba(247,241,238,0.3);
-}
-
-.slide-nav[data-on-dark="true"] .slide-dot.active {
-    border-color: var(--mauve);
-}
-
-.slide-nav[data-on-dark="true"] .slide-dot:hover {
-    background: var(--mauve);
-}
-
-
-/* ---------------------------------------------------------
-   Next-section arrow
---------------------------------------------------------- */
-
-.slide-arrow {
-    position: fixed;
-    left: 50%;
-    bottom: 32px;
-    transform: translateX(-50%);
-    z-index: 500;
-
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(6px);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 15px;
-    color: var(--text);
-
+/* All sections stay safely stacked in the grid, completely preserving your layouts */
+#mainSite .section,
+#mainSite .secret-section {
+    grid-column: 1;
+    grid-row: 1;
+    
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-
-    transition:
-        opacity 0.6s ease,
-        transform 0.35s ease,
-        background 0.35s ease;
-
-    animation: float 2.5s infinite ease-in-out;
+    
+    /* Slow, buttery-smooth 1.2s transition */
+    transition: opacity 1.2s ease, 
+                transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 1.2s ease;
 }
 
-#mainSite.visible ~ .slide-arrow.visible {
+/* Active section takes over the grid cell smoothly */
+#mainSite .section.active-section,
+#mainSite .secret-section.active-section {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
+    transform: translate(0, 0) scale(1);
+    z-index: 2;
 }
 
-.slide-arrow:hover {
-    background: var(--mauve);
-    transform: translateX(-50%) translateY(-4px);
+/* Custom directions */
+.slide-from-top { transform: translateY(-30px); }
+.slide-from-right { transform: translateX(30px); }
+.fade-in-only { opacity: 0; transform: scale(0.98); }
+.fade-in-only.active-section { opacity: 1; transform: scale(1); }
+.fade-out-style { opacity: 0; transform: scale(1.02); }
+.fade-out-style.active-section { opacity: 1; transform: scale(1); }
+
+.final-cinematic-reveal {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(6px);
+    transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.8s; 
 }
-
-.slide-arrow[data-on-dark="true"] {
-    border-color: rgba(247,241,238,0.25);
-    background: rgba(73,62,67,0.45);
-    color: var(--cream);
-}
-
-.slide-arrow[data-on-dark="true"]:hover {
-    background: var(--mauve);
-    color: var(--text);
-}
-
-.slide-arrow.at-end {
-    transform: translateX(-50%) rotate(180deg);
-}
-
-.slide-arrow.at-end:hover {
-    transform: translateX(-50%) rotate(180deg) translateY(4px);
-}
-
-
-@media (max-width: 800px) {
-
-    .slide-nav {
-        right: 14px;
-        gap: 10px;
-    }
-
-    .slide-dot {
-        width: 6px;
-        height: 6px;
-    }
-
-    .slide-arrow {
-        width: 36px;
-        height: 36px;
-        bottom: 18px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    .slides-track {
-        transition: none;
-    }
-
-    .slide-arrow {
-        animation: none;
-    }
+.final-cinematic-reveal.active-section {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
 }
