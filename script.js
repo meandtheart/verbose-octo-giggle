@@ -225,3 +225,100 @@ document.querySelectorAll("img").forEach(function (image) {
     });
 
 });
+
+
+// ================================
+// SWIPE GESTURE SUPPORT
+// ================================
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+// Define the ordered list of section IDs matching your navigation flow
+const sectionOrder = [
+    "hero",         // Note: Give your hero section id="hero" in index.html if it doesn't have one
+    "birthday",
+    "story",
+    "timeline",
+    "archive",
+    "music",
+    "things",
+    "unknown",
+    "letter",
+    "final-section"
+];
+
+const mainSiteContainer = document.getElementById("mainSite");
+
+if (mainSiteContainer) {
+    mainSiteContainer.addEventListener("touchstart", function (event) {
+        touchStartX = event.changedTouches[0].screenX;
+    }, { passive: true });
+
+    mainSiteContainer.addEventListener("touchend", function (event) {
+        touchEndX = event.changedTouches[0].screenX;
+        handleSwipeGesture();
+    }, { passive: true });
+}
+
+function handleSwipeGesture() {
+    const swipeThreshold = 50; // Minimum distance required for a swipe
+    const diff = touchEndX - touchStartX;
+
+    if (Math.abs(diff) < swipeThreshold) return; // Ignore accidental micro-swipes
+
+    // Find the currently active section
+    const activeSection = document.querySelector("#mainSite .section.active-section");
+    if (!activeSection) return;
+
+    let activeId = activeSection.id;
+    
+    // Fallback if hero section doesn't have an explicit id="hero" in html
+    if (!activeId && activeSection.classList.contains("hero")) {
+        activeId = "hero";
+    }
+
+    const currentIndex = sectionOrder.indexOf(activeId);
+    if (currentIndex === -1) return;
+
+    let targetId = null;
+
+    if (diff < 0) {
+        // Swiped Left -> Go Forward to the next section
+        if (currentIndex < sectionOrder.length - 1) {
+            targetId = sectionOrder[currentIndex + 1];
+        }
+    } else {
+        // Swiped Right -> Go Backward to the previous section
+        if (currentIndex > 0) {
+            targetId = sectionOrder[currentIndex - 1];
+        }
+    }
+
+    // If a valid target section exists, find its button and simulate a click to run your animation logic
+    if (targetId) {
+        // Special case for hero section since it uses a class scroll-btn with data-target="birthday"
+        let targetButton = document.querySelector(`.scroll-btn[data-target="${targetId}"]`);
+        
+        if (targetButton) {
+            targetButton.click();
+        } else {
+            // If a button isn't explicitly wired up for that transition, manually trigger the transition logic
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                allSections.forEach(function (sec) {
+                    sec.classList.remove(
+                        "active-section",
+                        "slide-from-top",
+                        "slide-from-right",
+                        "fade-in-only",
+                        "fade-out-style",
+                        "final-cinematic-reveal"
+                    );
+                });
+                targetElement.classList.add("fade-in-only", "active-section");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        }
+    }
+}
